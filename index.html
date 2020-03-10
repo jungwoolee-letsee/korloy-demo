@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+        name="viewport"/>
+
+  <title>Title</title>
+  <script src="./lib/letsee-0.9.20.js"></script>
+
+  <style type="text/css" media="place">
+    #container {
+      -letsee-target: uri('korloy-product.json');
+      -letsee-transform: translate(0, 0, 0);
+      background: rgba(76, 175, 80, 0.3);
+      width: 100px;
+      height: 300px;
+      color: white;
+      border: 2px solid red;
+    }
+
+  </style>
+  <style>
+    #startButton {
+      position: absolute;
+      z-index: 300;
+      background-color: white;
+    }
+  </style>
+</head>
+<body>
+
+<div id="container">
+  <h1>Hello</h1>
+</div>
+<button id="startButton">시작</button>
+
+<script>
+  const config = {
+    // appKey: '417e8094b7ba9bf9632d8cc5aa94b57fd65582d2d3d2112233e0a727d0d59d05',
+    trackerType: 'IMAGE',
+    bodyId: 'fallback-test'
+  };
+  window.addEventListener('load', function () {
+    initialBarcodeReader();
+    startLetsee();
+  });
+
+
+
+</script>
+
+<script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
+
+<script>
+  // Letsee init
+  function startLetsee() {
+    letsee.init(config, () => {
+      console.log('Loaded 됨!');
+      // for test
+      letsee.setVideoSource('4129ef6dd99c7ff3346cd5cb0446fae97b12e864e7136bdd0fdfb32d00f98e2c');
+    });
+    document.getElementsByTagName('video')[0].setAttribute('id','video');
+  }
+
+  // 초기 바코드 Reader init
+  function initialBarcodeReader() {
+    let selectedDeviceId;
+    const codeReader = new ZXing.BrowserMultiFormatReader();
+    console.log('ZXing code reader 초기화 성공~');
+    codeReader.getVideoInputDevices()
+      .then((videoInputDevices) => {
+        console.log(videoInputDevices);
+        /**
+         * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
+         */
+        selectedDeviceId = videoInputDevices[1].deviceId;
+        console.log(selectedDeviceId);
+        // const sourceSelect = document.getElementById('sourceSelect');
+        // if (videoInputDevices.length >= 1) {
+        //   videoInputDevices.forEach((element) => {
+        //     const sourceOption = document.createElement('option');
+        //     sourceOption.text = element.label;
+        //     sourceOption.value = element.deviceId;
+        //     sourceSelect.appendChild(sourceOption)
+        //   });
+        //
+        //   sourceSelect.onchange = () => {
+        //     selectedDeviceId = sourceSelect.value;
+        //   };
+        //
+        //   const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+        //   sourceSelectPanel.style.display = 'block'
+        // }
+        document.getElementById('startButton').addEventListener('click', () => {
+          codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+            if (result) {
+              console.log(result);
+              // document.getElementById('result').textContent = result.text
+            }
+            if (err && !(err instanceof ZXing.NotFoundException)) {
+              console.error(err);
+              // document.getElementById('result').textContent = err
+            }
+          });
+          console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+        });
+
+        // document.getElementById('resetButton').addEventListener('click', () => {
+        //   codeReader.reset();
+        //   document.getElementById('result').textContent = '';
+        //   console.log('Reset.')
+        // })
+
+      })
+      .catch((err) => {
+        console.error(err)
+      })
+  }
+
+  // 데이터 Matrix로부터 넘어온 String을 파싱함.
+  function parseProductNumberFromString(str) {
+
+  }
+
+</script>
+</body>
+</html>
