@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
         name="viewport"/>
+  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
 
   <title>Title</title>
   <link rel="stylesheet" href="style.css"/>
@@ -42,7 +43,7 @@
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
   <button class="bottomNavButton">
-    <img class="bottomNavButtonImage" src="assets/ico-certi@3x.png"/>
+    <img class="bottomNavButtonImage" onclick="productCertScreenController(1)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
   <button class="bottomNavButton">
@@ -51,6 +52,12 @@
       <h4 style="visibility: hidden">dummy</h4>
     </h4>
   </button>
+</div>
+
+<!-- 정품인증 Barcode 가이드 화면 -->
+<div id="barcodeGuide" style="display: none">
+  <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
+  <div id="barcodeGuideInnerBox"></div>
 </div>
 
 
@@ -74,9 +81,10 @@
     letsee.init(config, () => {
       console.log('Loaded 됨!');
       // for test
-      letsee.setVideoSource('4129ef6dd99c7ff3346cd5cb0446fae97b12e864e7136bdd0fdfb32d00f98e2c');
+      // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
+      letsee.setVideoSource('environment');
     });
-    document.getElementsByTagName('video')[0].setAttribute('id','video');
+    document.getElementsByTagName('video')[1].setAttribute('id','video');
   }
 
   // 초기 바코드 Reader init
@@ -137,6 +145,22 @@
   // 데이터 Matrix로부터 넘어온 String을 파싱함.
   function parseProductNumberFromString(str) {
 
+  }
+
+  // ----------- Dom, 화면 관련 메서드 ------------- //
+  let screenStack = 0;
+  function productCertScreenController(screenStack) {
+    let BARCODE_GUIDE = $("#barcodeGuide");
+    switch (screenStack) {
+      case 0:
+        BARCODE_GUIDE.hide();
+        break;
+      case 1:
+        BARCODE_GUIDE.show();
+        break;
+      case 2:
+        break;
+    }
   }
 
 </script>
