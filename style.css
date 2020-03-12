@@ -1,0 +1,66 @@
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+    font-family: 'Noto Sans KR', sans-serif;
+    line-height: 1.2;
+    box-sizing: border-box;
+    color: #000;
+}
+
+#buttonContainer {
+    position: absolute;
+    z-index: 300;
+    background-color: white;
+}
+
+#bottomNav {
+    position:absolute;
+    bottom: 0;
+    display: flex;
+    justify-content: space-evenly;
+    height: 20%;
+    flex-direction: row;
+    z-index: 250;
+    width: 100%;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.4);
+    background-size: cover;
+}
+
+.bottomNavButton {
+    width: 25%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background-image: url("assets/btn@3x.png");
+    background-size: cover;
+}
+
+.bottomNavButtonImage {
+    width: 55%;
+    object-fit: cover;
+}
+
+.bottomNavButtonText {
+    color: white;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 16px;
+    font-weight: bold;
+}
