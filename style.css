@@ -23,6 +23,14 @@ time, mark, audio, video {
     color: #000;
 }
 
+button {
+    outline: none;
+}
+
+input {
+    outline: none;
+}
+
 /* 하단 버튼 네비게이션 */
 #buttonContainer {
     position: absolute;
@@ -51,6 +59,7 @@ time, mark, audio, video {
     flex-direction: column;
     background-image: url("assets/btn@3x.png");
     background-size: cover;
+    border: 0;
 }
 
 .bottomNavButtonImage {
@@ -92,4 +101,148 @@ time, mark, audio, video {
     border: solid 5px #0089d1;
     margin-Bottom: 10vh;
     box-shadow: 0 0 0 1000px rgba(0,0,0,.5);
+}
+
+/* 제품인증 Modal */
+
+#modal {
+    position:absolute;
+    margin-top: 10vh;
+    margin-left: 5%;
+    z-index: 250;
+    width: 90%;
+    height: 65vh;
+    border: 1px solid white;
+    border-radius: 10px;
+    box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.4);
+    background-color: white
+}
+#modalHeader {
+    width: 100%;
+    height: 20%;
+    padding: 0 24px;
+    object-fit: cover;
+    background-color: #F0F0F0;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#modalHeader h1 {
+    color: #0089d1;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#modalHeader img {
+    width: 52px;
+    height: 52px;
+}
+
+#modalBody {
+    width: 100%;
+    height: 60%;
+}
+#modalGenuineInput {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    height: 100%;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+
+.modalGenuineInputItem {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalGenuineInputItem .modalGenuineInputItemText {
+    width: 100px
+}
+
+.modalGenuineInputItem h1 {
+    font-size: 18px;
+    color: #666666;
+    font-weight: bold;
+}
+
+.modalGenuineInputItem input {
+    border: solid 2px #999999;
+    background-color: #ededed;
+    color: #666666;
+    padding-top: 7px;
+    padding-bottom: 9px;
+    padding-left: 13px;
+    width: 55%;
+    border-radius: 4px;
+}
+
+#modalGenuineInput :nth-child(4) input {
+    background-color: white;
+    color: #0089d1;
+    border: solid 2px #0089d1;
+}
+
+#modalGenuineConfirm {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: start;
+    height: 100%;
+}
+
+#modalGenuineConfirmInfo {
+    height: 40%;
+    width: 100%;
+    font-size: 16px;
+    padding: 10px 10% 0;
+}
+
+#modalGenuineConfirmResult {
+    width: 100%;
+    height: 20%;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#modalGenuineConfirmResult h1 {
+    font-size: 20px;
+    color: #0089d1;
+}
+
+#modalFooter {
+    width: 90%;
+    height: 20%;
+    margin: 0 auto;
+    border-top: solid 1px #d8d6d6;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+#modalFooter button {
+    background-color: #878787;
+    border-radius: 20px;
+    border: 0;
+    padding: 12px 0 12px;
+    width: 35%;
+    text-align: center;
+    font-size: 20px;
+    color: white
+}
+
+#modalFooter :nth-child(2) {
+    background-color: #0D74C6;
 }

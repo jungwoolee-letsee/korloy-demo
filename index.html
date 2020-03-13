@@ -43,7 +43,7 @@
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
   <button class="bottomNavButton">
-    <img class="bottomNavButtonImage" onclick="productCertScreenController(1)" src="assets/ico-certi@3x.png"/>
+    <img class="bottomNavButtonImage" onclick="productGenuineScreenChange(1)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
   <button class="bottomNavButton">
@@ -58,6 +58,47 @@
 <div id="barcodeGuide" style="display: none">
   <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
   <div id="barcodeGuideInnerBox"></div>
+</div>
+
+<!-- 정품인증 모달 화면 -->
+<div id="modal">
+  <div id="modalHeader" onclick="modalScreenChange(-1)">
+    <h1>Genuine Product<br/>Certification</h1>
+    <img src="assets/close-btn@3x.png"/>
+  </div>
+  <div id="modalBody">
+    <div id="modalGenuineInput">
+      <div class="modalGenuineInputItem">
+        <div class="modalGenuineInputItemText"><h1>KP-CODE</h1></div>
+        <input type="text" value="bbb" disabled/>
+      </div>
+      <div class="modalGenuineInputItem">
+        <div class="modalGenuineInputItemText"><h1>LOT No.</h1></div>
+        <input type="text" disabled/>
+      </div>
+      <div class="modalGenuineInputItem">
+        <div class="modalGenuineInputItemText"><h1>SERIAL No.</h1></div>
+        <input type="text" disabled/>
+      </div>
+      <div class="modalGenuineInputItem">
+        <div class="modalGenuineInputItemText"><h1>GPN</h1></div>
+        <input type="text"/>
+      </div>
+    </div>
+    <div id="modalGenuineConfirm" style="display: none">
+      <div id="modalGenuineConfirmInfo">
+        <h1>KP-CODE : <font>000000000WWW</font></h1>
+        <h1>LOT No. : <font>DKDKDK</font></h1>
+        <h1>SERIAL NO. : <font>KDKDKD</font></h1>
+        <h1>GPN : <font>AJAJAJ</font></h1>
+      </div>
+      <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
+    </div>
+  </div>
+  <div id="modalFooter">
+    <button onclick="modalScreenChange(-1)">Cancel</button>
+    <button onclick="modalScreenChange(1)">OK</button>
+  </div>
 </div>
 
 
@@ -149,7 +190,7 @@
 
   // ----------- Dom, 화면 관련 메서드 ------------- //
   let screenStack = 0;
-  function productCertScreenController(screenStack) {
+  function productGenuineScreenChange(screenStack) {
     let BARCODE_GUIDE = $("#barcodeGuide");
     switch (screenStack) {
       case 0:
@@ -159,6 +200,33 @@
         BARCODE_GUIDE.show();
         break;
       case 2:
+        break;
+    }
+  }
+
+  let modalBodyStack = 0;
+  function modalScreenChange(modalBodyStack) {
+    let MODAL = $("#modal");
+    let MODAL_INPUT_SCREEN = $("#modalGenuineInput");
+    let MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
+
+    switch (modalBodyStack) {
+      case 0:
+        MODAL_INPUT_SCREEN.show();
+        MODAL_CONFIRM_SCREEN.hide();
+        break;
+      case 1:
+        // TODO : 정품인증을 하는 API를 태운 후 화면을 바꿔줘야함.
+        MODAL_INPUT_SCREEN.hide();
+        MODAL_CONFIRM_SCREEN.show();
+        break;
+
+      case -1: // modal close
+        MODAL.hide();
+        break;
+      case 100: // modal open
+        modalScreenChange(0);
+        MODAL.show();
         break;
     }
   }
