@@ -43,10 +43,10 @@
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
   <button class="bottomNavButton">
-    <img class="bottomNavButtonImage" onclick="productGenuineScreenChange(1)" src="assets/ico-certi@3x.png"/>
+    <img class="bottomNavButtonImage" onclick="productGenuineScreenChange(100)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
-  <button class="bottomNavButton">
+  <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
     <img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
     <h4 class="bottomNavButtonText">KTS<br/>
       <h4 style="visibility: hidden">dummy</h4>
@@ -109,7 +109,6 @@
     bodyId: 'fallback-test'
   };
   window.addEventListener('load', function () {
-    initialBarcodeReader();
     startLetsee();
   });
 </script>
@@ -117,19 +116,29 @@
 <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
 
 <script>
-  // Letsee init
+  /**
+   * 렛시 start 프로세스
+   * 1. 렛시를 초기화함.
+   * 2. 현재 video태그에 id가 없기 때문에 barcodeReader에서 인식할 수 있도록 id태그를 입력하여줌.
+   * 3. 후면카메라의 deviceId를 barcodeReader로 넘겨준다.
+   * 4. 후면카메라가 없을경우 예외처리. (테스트용도)
+   */
   function startLetsee() {
     letsee.init(config, () => {
       console.log('Loaded 됨!');
-      // for test
-      // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
-      letsee.setVideoSource('environment');
+      letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
+      // letsee.setVideoSource('environment');
+      document.getElementsByTagName('video')[0].setAttribute('id','video');
+
+      let environmentDeviceId = letsee.getSourceDeviceList()
+              .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
+
+      initialBarcodeReader();
     });
-    document.getElementsByTagName('video')[1].setAttribute('id','video');
   }
 
   // 초기 바코드 Reader init
-  function initialBarcodeReader() {
+  function initialBarcodeReader(deviceId) {
     let selectedDeviceId;
     const codeReader = new ZXing.BrowserMultiFormatReader();
     console.log('ZXing code reader 초기화 성공~');
@@ -183,23 +192,16 @@
       })
   }
 
-  // 데이터 Matrix로부터 넘어온 String을 파싱함.
-  function parseProductNumberFromString(str) {
-
-  }
-
   // ----------- Dom, 화면 관련 메서드 ------------- //
   let screenStack = 0;
   function productGenuineScreenChange(screenStack) {
     let BARCODE_GUIDE = $("#barcodeGuide");
     switch (screenStack) {
-      case 0:
+      case -1:
         BARCODE_GUIDE.hide();
         break;
-      case 1:
+      case 100:
         BARCODE_GUIDE.show();
-        break;
-      case 2:
         break;
     }
   }
@@ -231,6 +233,11 @@
     }
   }
 
+  // ----------- 기능 구현 ---------- //
+  // 데이터 Matrix로부터 넘어온 String을 파싱함.
+  function parseProductNumberFromString(str) {
+
+  }
 </script>
 </body>
 </html>
