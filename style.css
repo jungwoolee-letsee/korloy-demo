@@ -103,6 +103,17 @@ input {
     box-shadow: 0 0 0 1000px rgba(0,0,0,.5);
 }
 
+#barcodeGuideCancelButton {
+    margin-top: 3vh;
+    background-color: #878787;
+    border-radius: 20px;
+    border: 0;
+    padding: 8px 24px;
+    text-align: center;
+    font-size: 15px;
+    color: white;
+}
+
 /* 제품인증 Modal */
 
 #modal {
@@ -115,7 +126,7 @@ input {
     border: 1px solid white;
     border-radius: 10px;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.4);
-    background-color: white
+    background-color: white;
 }
 #modalHeader {
     width: 100%;

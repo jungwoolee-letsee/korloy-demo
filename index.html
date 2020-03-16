@@ -43,7 +43,7 @@
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
   <button class="bottomNavButton">
-    <img class="bottomNavButtonImage" onclick="productGenuineScreenChange(100)" src="assets/ico-certi@3x.png"/>
+    <img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
   <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
@@ -58,10 +58,11 @@
 <div id="barcodeGuide" style="display: none">
   <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
   <div id="barcodeGuideInnerBox"></div>
+  <button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-1)">Cancel</button>
 </div>
 
 <!-- 정품인증 모달 화면 -->
-<div id="modal">
+<div id="modal" style="display: none">
   <div id="modalHeader" onclick="modalScreenChange(-1)">
     <h1>Genuine Product<br/>Certification</h1>
     <img src="assets/close-btn@3x.png"/>
@@ -70,27 +71,27 @@
     <div id="modalGenuineInput">
       <div class="modalGenuineInputItem">
         <div class="modalGenuineInputItemText"><h1>KP-CODE</h1></div>
-        <input type="text" value="bbb" disabled/>
+        <input id="modalGenuineInputKpCode" type="text" value="bbb" disabled/>
       </div>
       <div class="modalGenuineInputItem">
         <div class="modalGenuineInputItemText"><h1>LOT No.</h1></div>
-        <input type="text" disabled/>
+        <input id="modalGenuineInputLotNumber" type="text" disabled/>
       </div>
       <div class="modalGenuineInputItem">
         <div class="modalGenuineInputItemText"><h1>SERIAL No.</h1></div>
-        <input type="text" disabled/>
+        <input id="modalGenuineInputSerialNumber" type="text" disabled/>
       </div>
       <div class="modalGenuineInputItem">
         <div class="modalGenuineInputItemText"><h1>GPN</h1></div>
-        <input type="text"/>
+        <input id="modalGenuineInputGpn" type="text"/>
       </div>
     </div>
     <div id="modalGenuineConfirm" style="display: none">
       <div id="modalGenuineConfirmInfo">
-        <h1>KP-CODE : <font>000000000WWW</font></h1>
-        <h1>LOT No. : <font>DKDKDK</font></h1>
-        <h1>SERIAL NO. : <font>KDKDKD</font></h1>
-        <h1>GPN : <font>AJAJAJ</font></h1>
+        <h1>KP-CODE : <font id="modalGenuineConfirmKpCode">000000000WWW</font></h1>
+        <h1>LOT No. : <font id="modalGenuineConfirmLotNumber">DKDKDK</font></h1>
+        <h1>SERIAL NO. : <font id="modalGenuineConfirmSerialNumber">KDKDKD</font></h1>
+        <h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
       </div>
       <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
     </div>
@@ -126,12 +127,12 @@
   function startLetsee() {
     letsee.init(config, () => {
       console.log('Loaded 됨!');
-      letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
+      // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
       // letsee.setVideoSource('environment');
       document.getElementsByTagName('video')[0].setAttribute('id','video');
 
-      let environmentDeviceId = letsee.getSourceDeviceList()
-              .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
+      // let environmentDeviceId = letsee.getSourceDeviceList()
+      //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
 
       initialBarcodeReader();
     });
@@ -148,7 +149,8 @@
         /**
          * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
          */
-        selectedDeviceId = videoInputDevices[1].deviceId;
+        // selectedDeviceId = videoInputDevices[1].deviceId;
+        selectedDeviceId = 'b6c53146faaa5bf52efaad3b80821652c6c41ed2f4569e9ff1346018176d5bb3';
         console.log(selectedDeviceId);
         // const sourceSelect = document.getElementById('sourceSelect');
         // if (videoInputDevices.length >= 1) {
@@ -169,8 +171,8 @@
         document.getElementById('startButton').addEventListener('click', () => {
           codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
             if (result) {
+              detected2DMatrixCallback(result);
               console.log(result);
-              // document.getElementById('result').textContent = result.text
             }
             if (err && !(err instanceof ZXing.NotFoundException)) {
               console.error(err);
@@ -193,37 +195,57 @@
   }
 
   // ----------- Dom, 화면 관련 메서드 ------------- //
-  let screenStack = 0;
-  function productGenuineScreenChange(screenStack) {
+  let barCodeGuideStack = 0;
+  function barCodeGuideStackChange(screenStack) {
     let BARCODE_GUIDE = $("#barcodeGuide");
     switch (screenStack) {
       case -1:
+        barCodeGuideStack = -1;
         BARCODE_GUIDE.hide();
         break;
       case 100:
+        barCodeGuideStack = 100;
         BARCODE_GUIDE.show();
         break;
     }
   }
 
   let modalBodyStack = 0;
+  let kpCode = 'test', lotNumber, serialNumber, gpn;
   function modalScreenChange(modalBodyStack) {
     let MODAL = $("#modal");
     let MODAL_INPUT_SCREEN = $("#modalGenuineInput");
+    let MODAL_INPUT_KP_CODE = $("#modalGenuineInputKpCode");
+    let MODAL_INPUT_LOT_NUMBER = $("#modalGenuineInputLotNumber");
+    let MODAL_INPUT_SERIAL_NUMBER = $("#modalGenuineInputSerialNumber");
+    let MODAL_INPUT_GPN = $("#modalGenuineInputGpn");
+
     let MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
+    let MODAL_CONFIRM_KP_CODE = $("#modalGenuineConfirmKpCode");
+    let MODAL_CONFIRM_LOT_NUMBER = $("#modalGenuineConfirmLotNumber");
+    let MODAL_CONFIRM_SERIAL_NUMBER = $("#modalGenuineConfirmSerialNumber");
+    let MODAL_CONFIRM_GPN = $("#modalGenuineConfirmGpn");
 
     switch (modalBodyStack) {
       case 0:
+        MODAL_INPUT_KP_CODE.val(kpCode);
+        MODAL_INPUT_LOT_NUMBER.val(lotNumber);
+        MODAL_INPUT_SERIAL_NUMBER.val(serialNumber);
         MODAL_INPUT_SCREEN.show();
         MODAL_CONFIRM_SCREEN.hide();
         break;
       case 1:
         // TODO : 정품인증을 하는 API를 태운 후 화면을 바꿔줘야함.
         MODAL_INPUT_SCREEN.hide();
+        MODAL_CONFIRM_KP_CODE.text(kpCode);
+        MODAL_CONFIRM_LOT_NUMBER.text(lotNumber);
+        MODAL_CONFIRM_SERIAL_NUMBER.text(serialNumber);
+        MODAL_CONFIRM_GPN.text(MODAL_INPUT_GPN.val());
         MODAL_CONFIRM_SCREEN.show();
         break;
 
       case -1: // modal close
+        MODAL_INPUT_GPN.val("");
         MODAL.hide();
         break;
       case 100: // modal open
@@ -234,10 +256,44 @@
   }
 
   // ----------- 기능 구현 ---------- //
-  // 데이터 Matrix로부터 넘어온 String을 파싱함.
+  /**
+   * 데이터 Matrix로부터 넘어온 String을 파싱함.
+   * 데이터 형식 : "1-02-037151000143326900550010A000118H31"
+   * 품번(KP-CODE) => 처음 11개 : 1번째부터 11번째 숫자.
+   * Lot번호 => 이후 10개 => 12번째부터 21번째 숫자.
+   * Serial번호 => 이후 4개 => 22번째부터 25번째 숫자.
+   */
   function parseProductNumberFromString(str) {
-
+    let _kpCode = str.substr(0, 11);
+    str = str.substr(11);
+    let _lotNumber = str.substr(0, 10);
+    str = str.substr(10);
+    let _serialNumber = str.substr(0, 4);
+    str = str.substr(4);
+    console.log(_kpCode, _lotNumber, _serialNumber);
+    return {_kpCode, _lotNumber, _serialNumber};
   }
+
+  /**
+   * zxing의 바코드 스캔 이후 동작하는 콜백함수
+   * 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱핟 뒤 제품인증 모달을 띄워준다.
+   */
+  function detected2DMatrixCallback (result) {
+    if (barCodeGuideStack === 100) {
+      let {_kpCode, _lotNumber, _serialNumber} = parseProductNumberFromString(result.text);
+      kpCode= _kpCode;
+      lotNumber = _lotNumber;
+      serialNumber = _serialNumber;
+
+      console.log(kpCode, lotNumber, serialNumber);
+      barCodeGuideStackChange(-1);
+      modalScreenChange(100);
+    }
+  }
+
+
+
+
 </script>
 </body>
 </html>
