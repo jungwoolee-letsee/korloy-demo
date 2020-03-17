@@ -14,18 +14,14 @@
     #container {
       -letsee-target: uri('korloy-product.json');
       -letsee-transform: translate(0, 0, 0);
-      background: rgba(76, 175, 80, 0.3);
       width: 100px;
       height: 300px;
-      color: white;
-      border: 2px solid red;
     }
   </style>
 </head>
 <body>
 
 <div id="container">
-  <a href="http://www.example.com/myfile.pdf#page=4">Hello</a>
 </div>
 <div id="buttonContainer">
   <button id="startButton">스캐닝 시작</button>
@@ -34,7 +30,7 @@
 <!-- 하단 푸터 네비게이터 -->
 <!-- 1.비디오보기, 2.pdf파일 열기 3.정품인증 4.공구계산기 -->
 <div id="bottomNav">
-  <button class="bottomNavButton">
+  <button class="bottomNavButton" onclick="location.href='https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164'">
     <img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
     <h4 class="bottomNavButtonText">Video<br/>Manual</h4>
   </button>
@@ -94,7 +90,7 @@
         <h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
       </div>
       <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
-    </div>
+  </div>
   </div>
   <div id="modalFooter">
     <button onclick="modalScreenChange(-1)">Cancel</button>
@@ -107,14 +103,19 @@
   const config = {
     // appKey: '417e8094b7ba9bf9632d8cc5aa94b57fd65582d2d3d2112233e0a727d0d59d05',
     trackerType: 'IMAGE',
-    bodyId: 'fallback-test'
+    bodyId: 'fallback-test',
+    external: "THREE",
   };
   window.addEventListener('load', function () {
     startLetsee();
   });
 </script>
 
+<!-- 서드파티 라이브러리 -->
 <script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js"></script>
+<script src="vendor/inflate.min.js"></script>
+<script src="vendor/loaders/STLLoader.js"></script>
 
 <script>
   /**
@@ -128,13 +129,15 @@
     letsee.init(config, () => {
       console.log('Loaded 됨!');
       // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
-      // letsee.setVideoSource('environment');
+      // 로지텍 디바이스
+      letsee.setVideoSource('14e1a19de88888d08a338d1130985a562c4664d9f60c94278b51ff5147bdf87b');
       document.getElementsByTagName('video')[0].setAttribute('id','video');
 
       // let environmentDeviceId = letsee.getSourceDeviceList()
       //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
 
       initialBarcodeReader();
+      initial3DModel();
     });
   }
 
@@ -150,7 +153,8 @@
          * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
          */
         // selectedDeviceId = videoInputDevices[1].deviceId;
-        selectedDeviceId = 'b6c53146faaa5bf52efaad3b80821652c6c41ed2f4569e9ff1346018176d5bb3';
+        // letsee.setVideoSource('environment');
+        // selectedDeviceId = 'b6c53146faaa5bf52efaad3b80821652c6c41ed2f4569e9ff1346018176d5bb3';
         console.log(selectedDeviceId);
         // const sourceSelect = document.getElementById('sourceSelect');
         // if (videoInputDevices.length >= 1) {
@@ -291,9 +295,36 @@
     }
   }
 
-
-
-
+  // -------------3D 모델 로드 ------------ //
+  let world = new THREE.Object3D();
+  let scene ;
+  function initial3DModel() {
+    // Using renderer, camera and scene from Engine.
+    const renderer = letsee.threeRenderer;
+    const camera = renderer.camera;
+    scene = renderer.scene;
+    renderer.addObjectToEntity('korloy-product.json', world);
+    scene.add( new THREE.HemisphereLight( 0x000000, 0xffffff ) );
+    var loader = new THREE.STLLoader();
+    loader.load( './models/stl/korloy.stl', function ( geometry ) {
+      var material = new THREE.MeshPhongMaterial({
+        color: 0xc7c7c2,
+        specular: 0x000000,
+        shininess: 100,
+        emissive: 0x0,
+      });
+      var mesh = new THREE.Mesh( geometry, material );
+      mesh.position.set( 0, 0, 30 );
+      mesh.scale.set( 0.5, 0.5, 0.5 );
+      mesh.castShadow = true;
+      mesh.receiveShadow = true;
+      world.add(mesh);
+    }, (progress) => {
+      console.log(progress);
+    }, (error) => {
+      console.log(error);
+    });
+  }
 </script>
 </body>
 </html>
