@@ -132,7 +132,6 @@
       // 로지텍 디바이스
       letsee.setVideoSource('14e1a19de88888d08a338d1130985a562c4664d9f60c94278b51ff5147bdf87b');
       document.getElementsByTagName('video')[0].setAttribute('id','video');
-
       // let environmentDeviceId = letsee.getSourceDeviceList()
       //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
 
@@ -259,30 +258,27 @@
     }
   }
 
-  // ----------- 기능 구현 ---------- //
-  /**
-   * 데이터 Matrix로부터 넘어온 String을 파싱함.
-   * 데이터 형식 : "1-02-037151000143326900550010A000118H31"
-   * 품번(KP-CODE) => 처음 11개 : 1번째부터 11번째 숫자.
-   * Lot번호 => 이후 10개 => 12번째부터 21번째 숫자.
-   * Serial번호 => 이후 4개 => 22번째부터 25번째 숫자.
-   */
-  function parseProductNumberFromString(str) {
-    let _kpCode = str.substr(0, 11);
-    str = str.substr(11);
-    let _lotNumber = str.substr(0, 10);
-    str = str.substr(10);
-    let _serialNumber = str.substr(0, 4);
-    str = str.substr(4);
-    console.log(_kpCode, _lotNumber, _serialNumber);
-    return {_kpCode, _lotNumber, _serialNumber};
-  }
-
-  /**
-   * zxing의 바코드 스캔 이후 동작하는 콜백함수
-   * 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱핟 뒤 제품인증 모달을 띄워준다.
-   */
+  // zxing의 바코드 스캔 이후 동작하는 콜백함수
+  // 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱한 뒤 제품인증 모달을 띄워준다.
   function detected2DMatrixCallback (result) {
+    /**
+     * 데이터 Matrix로부터 넘어온 String을 파싱함.
+     * 데이터 형식 : "1-02-037151000143326900550010A000118H31"
+     * 품번(KP-CODE) => 처음 11개 : 1번째부터 11번째 숫자.
+     * Lot번호 => 이후 10개 => 12번째부터 21번째 숫자.
+     * Serial번호 => 이후 4개 => 22번째부터 25번째 숫자.
+     */
+    const parseProductNumberFromString = (str) => {
+      let _kpCode = str.substr(0, 11);
+      str = str.substr(11);
+      let _lotNumber = str.substr(0, 10);
+      str = str.substr(10);
+      let _serialNumber = str.substr(0, 4);
+      str = str.substr(4);
+      console.log(_kpCode, _lotNumber, _serialNumber);
+      return {_kpCode, _lotNumber, _serialNumber};
+    };
+
     if (barCodeGuideStack === 100) {
       let {_kpCode, _lotNumber, _serialNumber} = parseProductNumberFromString(result.text);
       kpCode= _kpCode;
@@ -295,30 +291,49 @@
     }
   }
 
-  // -------------3D 모델 로드 ------------ //
-  let world = new THREE.Object3D();
-  let scene ;
+  // 3D STL모델을 화면에 그려주고 z축 회전 애니메이션을 동작시켜주는 함수.
   function initial3DModel() {
-    // Using renderer, camera and scene from Engine.
-    const renderer = letsee.threeRenderer;
-    const camera = renderer.camera;
-    scene = renderer.scene;
-    renderer.addObjectToEntity('korloy-product.json', world);
-    scene.add( new THREE.HemisphereLight( 0x000000, 0xffffff ) );
-    var loader = new THREE.STLLoader();
-    loader.load( './models/stl/korloy.stl', function ( geometry ) {
-      var material = new THREE.MeshPhongMaterial({
+    this.world = new THREE.Object3D();
+    this.renderer = letsee.threeRenderer;
+    this.camera = renderer.camera;
+    this.scene = renderer.scene;
+    this.loader = new THREE.STLLoader();
+    this.mesh = null;
+    this.oldTime = null;
+
+    this.renderer.addObjectToEntity('korloy-product.json', this.world);
+    this.scene.add( new THREE.HemisphereLight( 0x000000, 0xffffff ));
+
+    // 3D 모델을 Z축으로 회전시켜줌.
+    // letsee의 engine프레임과 동시화시켜줌.
+    const rotateZaxis = (object) => (tick) => {
+      // tick : 한프레임당 계산이 끝난 시간에 따른 누계.
+      // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
+      if(this.oldTime) {
+        const delta = tick- this.oldTime;
+        object.rotation.z = object.rotation.z + 0.05;
+        requestAnimationFrame(rotateZaxis);
+      }
+      this.oldTime = tick;
+    };
+
+    this.loader.load( './models/stl/korloy.stl', (geometry) => {
+      const material = new THREE.MeshPhongMaterial({
         color: 0xc7c7c2,
         specular: 0x000000,
         shininess: 100,
         emissive: 0x0,
       });
-      var mesh = new THREE.Mesh( geometry, material );
-      mesh.position.set( 0, 0, 30 );
-      mesh.scale.set( 0.5, 0.5, 0.5 );
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      world.add(mesh);
+      this.mesh = new THREE.Mesh( geometry, material );
+      this.mesh.position.set( 0, 0, 30 );
+      this.mesh.scale.set( 0.5, 0.5, 0.5 );
+      this.mesh.castShadow = true;
+      this.mesh.receiveShadow = true;
+      this.world.add(this.mesh);
+      letsee.addRenderModule({
+        name: '3DObjectRotate',
+        onRender: rotateYaxis(this.mesh)
+      });
     }, (progress) => {
       console.log(progress);
     }, (error) => {
