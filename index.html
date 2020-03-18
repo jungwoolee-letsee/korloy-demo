@@ -24,7 +24,13 @@
 <div id="container">
 </div>
 <div id="buttonContainer">
-  <button id="startButton">스캐닝 시작</button>
+  <div id="sourceSelectPanel" style="display: block;">
+    <label for="sourceSelect">Change video source:</label>
+    <select id="sourceSelect" style="max-width:400px">
+    </select>
+  </div>
+  <button id="startButton">시작</button>
+  <button id="resetButton">중지</button>
 </div>
 
 <!-- 하단 푸터 네비게이터 -->
@@ -90,7 +96,7 @@
         <h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
       </div>
       <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
-  </div>
+    </div>
   </div>
   <div id="modalFooter">
     <button id="modalFooterCancelButton">Cancel</button>
@@ -130,7 +136,7 @@
       console.log('Loaded 됨!');
       // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
       // 로지텍 디바이스
-      letsee.setVideoSource('14e1a19de88888d08a338d1130985a562c4664d9f60c94278b51ff5147bdf87b');
+      letsee.setVideoSource('environment');
       document.getElementsByTagName('video')[0].setAttribute('id','video');
       // let environmentDeviceId = letsee.getSourceDeviceList()
       //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
@@ -146,55 +152,61 @@
     const codeReader = new ZXing.BrowserMultiFormatReader();
     console.log('ZXing code reader 초기화 성공~');
     codeReader.getVideoInputDevices()
-      .then((videoInputDevices) => {
-        console.log(videoInputDevices);
-        /**
-         * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
-         */
-        // selectedDeviceId = videoInputDevices[1].deviceId;
-        // letsee.setVideoSource('environment');
-        // selectedDeviceId = 'b6c53146faaa5bf52efaad3b80821652c6c41ed2f4569e9ff1346018176d5bb3';
-        console.log(selectedDeviceId);
-        // const sourceSelect = document.getElementById('sourceSelect');
-        // if (videoInputDevices.length >= 1) {
-        //   videoInputDevices.forEach((element) => {
-        //     const sourceOption = document.createElement('option');
-        //     sourceOption.text = element.label;
-        //     sourceOption.value = element.deviceId;
-        //     sourceSelect.appendChild(sourceOption)
-        //   });
-        //
-        //   sourceSelect.onchange = () => {
-        //     selectedDeviceId = sourceSelect.value;
-        //   };
-        //
-        //   const sourceSelectPanel = document.getElementById('sourceSelectPanel')
-        //   sourceSelectPanel.style.display = 'block'
-        // }
-        document.getElementById('startButton').addEventListener('click', () => {
-          codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
-            if (result) {
-              detected2DMatrixCallback(result);
-              console.log(result);
-            }
-            if (err && !(err instanceof ZXing.NotFoundException)) {
-              console.error(err);
-              // document.getElementById('result').textContent = err
-            }
-          });
-          console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
-        });
+            .then((videoInputDevices) => {
+              /**
+               * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
+               */
+              // selectedDeviceId = videoInputDevices[1].deviceId;
+              // letsee.setVideoSource('environment');
+              // selectedDeviceId = 'b6c53146faaa5bf52efaad3b80821652c6c41ed2f4569e9ff1346018176d5bb3';
+              console.log(selectedDeviceId);
+              const sourceSelect = document.getElementById('sourceSelect');
+              if (videoInputDevices.length >= 1) {
+                videoInputDevices.forEach((element) => {
+                  const sourceOption = document.createElement('option');
+                  sourceOption.text = element.label;
+                  sourceOption.value = element.deviceId;
+                  sourceSelect.appendChild(sourceOption)
+                });
 
-        // document.getElementById('resetButton').addEventListener('click', () => {
-        //   codeReader.reset();
-        //   document.getElementById('result').textContent = '';
-        //   console.log('Reset.')
-        // })
+                sourceSelect.onchange = () => {
+                  selectedDeviceId = sourceSelect.value;
+                };
 
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+                const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+                sourceSelectPanel.style.display = 'block'
+              }
+              document.getElementById('startButton').addEventListener('click', () => {
+                codeReader.reset();
+
+                setTimeout(() => {
+                  letsee.setVideoSource(selectedDeviceId);
+                }, 1000);
+
+                setTimeout(() => {
+                  codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+                    if (result) {
+                      detected2DMatrixCallback(result);
+                      console.log(result);
+                    }
+                    if (err && !(err instanceof ZXing.NotFoundException)) {
+                      console.error(err);
+                      // document.getElementById('result').textContent = err
+                    }
+                  });
+                }, 3000);
+                console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+              });
+
+              document.getElementById('resetButton').addEventListener('click', () => {
+                codeReader.reset();
+                letsee.setVideoSource(selectedDeviceId);
+              })
+
+            })
+            .catch((err) => {
+              console.error(err)
+            })
   }
 
   // ----------- Dom, 화면 관련 메서드 ------------- //
@@ -356,7 +368,7 @@
       if(this.oldTime) {
         const delta = tick- this.oldTime;
         //console.log(delta);
-        object.rotation.z = object.rotation.z + 0.05;
+        object.rotation.z = object.rotation.z + 0.1;
         requestAnimationFrame(rotateZaxis);
       }
       this.oldTime = tick;
