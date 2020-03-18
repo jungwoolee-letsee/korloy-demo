@@ -93,8 +93,8 @@
   </div>
   </div>
   <div id="modalFooter">
-    <button onclick="modalScreenChange(-1)">Cancel</button>
-    <button onclick="modalScreenChange(1)">OK</button>
+    <button id="modalFooterCancelButton">Cancel</button>
+    <button id="modalFooterOkButton">OK</button>
   </div>
 </div>
 
@@ -200,7 +200,7 @@
   // ----------- Dom, 화면 관련 메서드 ------------- //
   let barCodeGuideStack = 0;
   function barCodeGuideStackChange(screenStack) {
-    let BARCODE_GUIDE = $("#barcodeGuide");
+    const BARCODE_GUIDE = $("#barcodeGuide");
     switch (screenStack) {
       case -1:
         barCodeGuideStack = -1;
@@ -213,50 +213,94 @@
     }
   }
 
-  let modalBodyStack = 0;
-  let kpCode = 'test', lotNumber, serialNumber, gpn;
-  function modalScreenChange(modalBodyStack) {
-    let MODAL = $("#modal");
-    let MODAL_INPUT_SCREEN = $("#modalGenuineInput");
-    let MODAL_INPUT_KP_CODE = $("#modalGenuineInputKpCode");
-    let MODAL_INPUT_LOT_NUMBER = $("#modalGenuineInputLotNumber");
-    let MODAL_INPUT_SERIAL_NUMBER = $("#modalGenuineInputSerialNumber");
-    let MODAL_INPUT_GPN = $("#modalGenuineInputGpn");
+  const MODAL = $("#modal");
+  const MODAL_INPUT_SCREEN = $("#modalGenuineInput");
+  const MODAL_INPUT_KP_CODE = $("#modalGenuineInputKpCode");
+  const MODAL_INPUT_LOT_NUMBER = $("#modalGenuineInputLotNumber");
+  const MODAL_INPUT_SERIAL_NUMBER = $("#modalGenuineInputSerialNumber");
+  const MODAL_INPUT_GPN = $("#modalGenuineInputGpn");
 
-    let MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
-    let MODAL_CONFIRM_KP_CODE = $("#modalGenuineConfirmKpCode");
-    let MODAL_CONFIRM_LOT_NUMBER = $("#modalGenuineConfirmLotNumber");
-    let MODAL_CONFIRM_SERIAL_NUMBER = $("#modalGenuineConfirmSerialNumber");
-    let MODAL_CONFIRM_GPN = $("#modalGenuineConfirmGpn");
+  const MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
+  const MODAL_CONFIRM_KP_CODE = $("#modalGenuineConfirmKpCode");
+  const MODAL_CONFIRM_LOT_NUMBER = $("#modalGenuineConfirmLotNumber");
+  const MODAL_CONFIRM_SERIAL_NUMBER = $("#modalGenuineConfirmSerialNumber");
+  const MODAL_CONFIRM_GPN = $("#modalGenuineConfirmGpn");
+  const MODAL_CONFIRM_RESULT = $("#modalGenuineConfirmResult");
 
-    switch (modalBodyStack) {
+  const MODAL_FOOTER_OK_BUTTON = $("#modalFooterOkButton");
+  const MODAL_FOOTER_CANCEL_BUTTON = $("#modalFooterCancelButton");
+
+  let kpCode, lotNumber, serialNumber, gpn;
+  let modalBodyState = 0;
+  function modalScreenChange(state) {
+    // 100: 모달화면 열기 / -1: 모달화면 닫기 / 0: input화면 열기 / 1: confirm화면 (제품번호 일치) / 2: confirm화면 (제품번호 불일치)
+    switch (state) {
       case 0:
         MODAL_INPUT_KP_CODE.val(kpCode);
         MODAL_INPUT_LOT_NUMBER.val(lotNumber);
         MODAL_INPUT_SERIAL_NUMBER.val(serialNumber);
         MODAL_INPUT_SCREEN.show();
         MODAL_CONFIRM_SCREEN.hide();
+        modalBodyState = 0;
         break;
+
       case 1:
-        // TODO : 정품인증을 하는 API를 태운 후 화면을 바꿔줘야함.
         MODAL_INPUT_SCREEN.hide();
         MODAL_CONFIRM_KP_CODE.text(kpCode);
         MODAL_CONFIRM_LOT_NUMBER.text(lotNumber);
         MODAL_CONFIRM_SERIAL_NUMBER.text(serialNumber);
         MODAL_CONFIRM_GPN.text(MODAL_INPUT_GPN.val());
+        const inputGpn = MODAL_CONFIRM_GPN.text();
+        // dmmmy GPN과 일치여부 판단.
+        if (inputGpn === '8GLXC42') {
+          MODAL_CONFIRM_RESULT.text('Thank you for using a genuine product.');
+          MODAL_FOOTER_CANCEL_BUTTON.hide();
+          modalBodyState = 1;
+        } else {
+          MODAL_CONFIRM_RESULT.text('This product is not Genuine.');
+          MODAL_FOOTER_OK_BUTTON.text('Try Again');
+          modalBodyState = 2;
+        }
         MODAL_CONFIRM_SCREEN.show();
         break;
 
       case -1: // modal close
         MODAL_INPUT_GPN.val("");
         MODAL.hide();
+        modalBodyState = -1;
         break;
+
       case 100: // modal open
         modalScreenChange(0);
+        MODAL_FOOTER_OK_BUTTON.text('Ok');
         MODAL.show();
         break;
     }
   }
+
+  // 100: 모달화면 열기 / -1: 모달화면 닫기 / 0: input화면 열기 / 1: confirm화면 (제품번호 일치) / 2: confirm화면 (제품번호 불일치)
+  MODAL_FOOTER_OK_BUTTON.click( function() {
+    if (modalBodyState === 0) {
+      modalScreenChange(1);
+    } else if (modalBodyState === 1) {
+      // 제품번호 일치시 OK버튼 클릭
+      MODAL_CONFIRM_KP_CODE.text('');
+      MODAL_CONFIRM_LOT_NUMBER.text('');
+      MODAL_CONFIRM_SERIAL_NUMBER.text('');
+      MODAL_FOOTER_CANCEL_BUTTON.show();
+      modalScreenChange(-1);
+    } else if (modalBodyState === 2) {
+      // 제품번호 불일치시 OK버튼 클릭
+      MODAL_FOOTER_OK_BUTTON.text('Ok');
+      modalScreenChange(0);
+    }
+  });
+  MODAL_FOOTER_CANCEL_BUTTON.click(function() {
+    MODAL_CONFIRM_KP_CODE.text('');
+    MODAL_CONFIRM_LOT_NUMBER.text('');
+    MODAL_CONFIRM_SERIAL_NUMBER.text('');
+    modalScreenChange(-1);
+  });
 
   // zxing의 바코드 스캔 이후 동작하는 콜백함수
   // 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱한 뒤 제품인증 모달을 띄워준다.
@@ -311,6 +355,7 @@
       // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
       if(this.oldTime) {
         const delta = tick- this.oldTime;
+        //console.log(delta);
         object.rotation.z = object.rotation.z + 0.05;
         requestAnimationFrame(rotateZaxis);
       }
@@ -332,7 +377,7 @@
       this.world.add(this.mesh);
       letsee.addRenderModule({
         name: '3DObjectRotate',
-        onRender: rotateYaxis(this.mesh)
+        onRender: rotateZaxis(this.mesh)
       });
     }, (progress) => {
       console.log(progress);
