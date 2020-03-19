@@ -51,6 +51,7 @@ input {
     width: 100%;
     box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.4);
     background-size: cover;
+    touch-action: none;
 }
 
 .bottomNavButton {
@@ -261,11 +262,27 @@ input {
 }
 
 #buttonContainer {
-
+    background-color: transparent;
 }
 
 #sourceButtonItems {
     display: flex;
     flex-direction: row;
     justify-content: space-evenly;
+}
+
+#gifContainer {
+    position: absolute;
+    z-index: 250;
+    width: 100%;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-content: center;
+}
+
+#gifImage {
+    width: 20%;
+    object-fit: contain;
+    margin-bottom: 10vh;
 }

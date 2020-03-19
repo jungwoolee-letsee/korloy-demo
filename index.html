@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-        name="viewport"/>
-  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
-  <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800|Noto+Sans+KR:400,500,700|Roboto:400,500,700&display=swap&subset=korean" rel="stylesheet">
-  <title>Title</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="../lib/letsee-0.9.20.js"></script>
+	<meta charset="UTF-8">
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+	      name="viewport"/>
+	<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+	<link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800|Noto+Sans+KR:400,500,700|Roboto:400,500,700&display=swap&subset=korean" rel="stylesheet">
+	<title>Title</title>
+	<link rel="stylesheet" href="style.css"/>
+	<script src="../../lib/letsee-0.9.20.js"></script>
 
-  <style type="text/css" media="place">
-    #container {
-      -letsee-target: uri('korloy-product.json');
-      -letsee-transform: translate(0, 0, 0);
-      width: 100px;
-      height: 300px;
-    }
-  </style>
+	<style type="text/css" media="place">
+		#container {
+			-letsee-target: uri('korloy-product.json');
+			-letsee-transform: translate(0, 0, 0);
+			width: 100px;
+			height: 300px;
+		}
+	</style>
+
 </head>
 <body>
 
@@ -42,7 +43,7 @@
     <img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
     <h4 class="bottomNavButtonText">Video<br/>Manual</h4>
   </button>
-  <button class="bottomNavButton" onclick="location.href='https://browser.letsee.io/korloy/korloy.pdf'">
+  <button class="bottomNavButton" onclick="location.href='https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing'">
     <img class="bottomNavButtonImage" src="assets/ico-pdf@3x.png"/>
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
@@ -50,7 +51,7 @@
     <img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
-  <button class="bottomNavButton" onclick="location.href='http://kts.korlㅎㄴoy.com/app/kts/index.html#/kts/calc'" >
+  <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
     <img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
     <h4 class="bottomNavButtonText">KTS<br/>
       <h4 style="visibility: hidden">dummy</h4>
@@ -60,10 +61,15 @@
 
 <!-- 정품인증 Barcode 가이드 화면 -->
 <div id="barcodeGuide" style="display: none">
-  <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
-  <div id="barcodeGuideInnerBox"></div>
-  <button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-1)">Cancel</button>
+	<img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
+	<div id="barcodeGuideInnerBox"></div>
+	<button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-2)">Cancel</button>
 </div>
+
+<div id="gifContainer">
+  <img id="gifImage" src="assets/ico_check.gif" alt="">
+</div>
+
 
 <!-- 정품인증 모달 화면 -->
 <div id="modal" style="display: none">
@@ -106,7 +112,6 @@
   </div>
 </div>
 
-
 <script>
   const config = {
     // appKey: '417e8094b7ba9bf9632d8cc5aa94b57fd65582d2d3d2112233e0a727d0d59d05',
@@ -145,8 +150,18 @@
 
       initialBarcodeReader();
       initial3DModel();
+      $(".ar-renderer").css('touch-action','none');
     });
   }
+
+  function toogleCheckGif() {
+    var $img = $('#gifImage');
+    $img.show();
+    setTimeout(function() {
+      $img.attr('src', 'assets/ico_check.gif');
+    }, 1.2);
+  }
+
 
   // 초기 바코드 Reader init
   let currentDeviceId;
@@ -156,38 +171,39 @@
     codeReader = new ZXing.BrowserMultiFormatReader();
     console.log('ZXing code reader 초기화 성공~');
     codeReader.getVideoInputDevices()
-            .then((videoInputDevices) => {
-              console.log(selectedDeviceId);
-              const sourceSelect = document.getElementById('sourceSelect');
-              if (videoInputDevices.length >= 1) {
+    codeReader.getVideoInputDevices()
+        .then((videoInputDevices) => {
+            console.log(selectedDeviceId);
+            const sourceSelect = document.getElementById('sourceSelect');
+            if (videoInputDevices.length >= 1) {
                 videoInputDevices.forEach((element) => {
-                  const sourceOption = document.createElement('option');
-                  sourceOption.text = element.label;
-                  sourceOption.value = element.deviceId;
-                  sourceSelect.appendChild(sourceOption)
+                    const sourceOption = document.createElement('option');
+                    sourceOption.text = element.label;
+                    sourceOption.value = element.deviceId;
+                    sourceSelect.appendChild(sourceOption)
                 });
                 sourceSelect.onchange = () => {
-                  selectedDeviceId = sourceSelect.value;
-                  currentDeviceId = selectedDeviceId;
+                    selectedDeviceId = sourceSelect.value;
+                    currentDeviceId = selectedDeviceId;
                 };
                 const sourceSelectPanel = document.getElementById('sourceSelectPanel')
                 sourceSelectPanel.style.display = 'block'
-              }
-              document.getElementById('startButton').addEventListener('click', () => {
+            }
+            document.getElementById('startButton').addEventListener('click', () => {
                 codeReader.reset();
                 setTimeout(() => {
-                  letsee.setVideoSource(selectedDeviceId);
+                    letsee.setVideoSource(selectedDeviceId);
                 }, 1000);
                 console.log(`현재 사용할 device id 저장됨.`)
-              });
-              document.getElementById('resetButton').addEventListener('click', () => {
+            });
+            document.getElementById('resetButton').addEventListener('click', () => {
                 codeReader.reset();
                 letsee.setVideoSource(selectedDeviceId);
-              })
             })
-            .catch((err) => {
-              console.error(err)
-            })
+        })
+        .catch((err) => {
+            console.error(err)
+        })
   }
   function startBarcodeReader() {
     // zxing Start
@@ -208,20 +224,37 @@
     letsee.setVideoSource(currentDeviceId);
   }
 
+  function showMeshObject(flag) {
+    if(mesh === null || mesh === undefined) {
+      // mesh.visible = false;
+    }
+    else {mesh.visible = flag;}
+  }
+
   // ----------- Dom, 화면 관련 메서드 ------------- //
   let barCodeGuideStack = 0;
   function barCodeGuideStackChange(screenStack) {
     const BARCODE_GUIDE = $("#barcodeGuide");
     switch (screenStack) {
+      // 모달 화면 띄우기.
       case -1:
         barCodeGuideStack = -1;
         BARCODE_GUIDE.hide();
+        showMeshObject(false);
         stopBarCodeReader();
         break;
+      // 취소 버튼 눌렀을 시
+      case -2: {
+        barCodeGuideStack = -2;
+        BARCODE_GUIDE.hide();
+        showMeshObject(true);
+        break;
+      }
       case 100:
         barCodeGuideStack = 100;
         startBarcodeReader();
         BARCODE_GUIDE.show();
+        showMeshObject(false);
         break;
     }
   }
@@ -282,6 +315,7 @@
         MODAL.hide();
         modalBodyState = -1;
         letsee.setVideoSource(currentDeviceId);
+        showMeshObject(true);
         break;
 
       case 100: // modal open
@@ -337,15 +371,20 @@
       return {_kpCode, _lotNumber, _serialNumber};
     };
 
+    // 바코드 가이드 화면이 열렸을 때에만 파싱 수행 후 gltf 애니메이션을 보여준다.
     if (barCodeGuideStack === 100) {
       let {_kpCode, _lotNumber, _serialNumber} = parseProductNumberFromString(result.text);
       kpCode= _kpCode;
       lotNumber = _lotNumber;
       serialNumber = _serialNumber;
-
-      console.log(kpCode, lotNumber, serialNumber);
+      // 바코드 리더를 닫고 애니메이션을 보여준다.
       barCodeGuideStackChange(-1);
-      modalScreenChange(100);
+      $("#gifContainer").css('display', 'flex');
+      toogleCheckGif();
+      setTimeout(function() {
+        modalScreenChange(100);
+        $("#gifContainer").css('display', 'none');
+      }, 700);
     }
   }
 
@@ -370,11 +409,16 @@
       // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
       if(this.oldTime) {
         const delta = tick- this.oldTime;
-        // let time = Date.now() * 0.0004;
+        // if (this.mesh !== null) {
+        //   this.mesh.rotation.x = delta * 0.7;
+        //   this.mesh.rotation.z = delta;
+        // }
+
+        let time = Date.now() * 0.003;
         if (this.mesh !== null) {
-          this.mesh.rotation.x = delta * 0.00007;
-          this.mesh.rotation.z = delta * 0.00004;
+          this.mesh.rotation.z = time;
         }
+
         requestAnimationFrame(animate);
       }
       this.oldTime = tick;
@@ -388,14 +432,15 @@
         emissive: 0x0,
       });
       this.mesh = new THREE.Mesh( geometry, material );
-      this.mesh.position.set( -10, 0, 10 );
+      this.mesh.position.set(0, 0, 10 );
       this.mesh.scale.set( 0.5, 0.5, 0.5 );
-      this.mesh.rotation.x = -15;
-      this.mesh.rotation.y = -260;
 
       this.mesh.castShadow = true;
       this.mesh.receiveShadow = true;
       this.world.add(this.mesh);
+
+      this.world.rotation.set(-15, -260, 0);
+
       mesh = this.mesh;
       letsee.addRenderModule({
         name: '3DObjectRotate',
