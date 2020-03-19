@@ -1,107 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
-        name="viewport"/>
-  <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
-  <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800|Noto+Sans+KR:400,500,700|Roboto:400,500,700&display=swap&subset=korean" rel="stylesheet">
-  <title>Title</title>
-  <link rel="stylesheet" href="style.css"/>
-  <script src="../lib/letsee-0.9.20.js"></script>
-
-  <style type="text/css" media="place">
-    #container {
-      -letsee-target: uri('korloy-product.json');
-      -letsee-transform: translate(0, 0, 0);
-      width: 100px;
-      height: 300px;
-    }
-  </style>
+	<meta charset="UTF-8">
+	<meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+	      name="viewport"/>
+	<script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+	<link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800|Noto+Sans+KR:400,500,700|Roboto:400,500,700&display=swap&subset=korean" rel="stylesheet">
+	<title>Title</title>
+	<link rel="stylesheet" href="style.css"/>
+	<script src="../../lib/letsee-0.9.20.js"></script>
+	
+	<style type="text/css" media="place">
+		#container {
+			-letsee-target: uri('korloy-product.json');
+			-letsee-transform: translate(0, 0, 0);
+			width: 100px;
+			height: 300px;
+		}
+	</style>
 </head>
 <body>
 
 <div id="container">
 </div>
 <div id="buttonContainer">
-  <div id="sourceSelectPanel" style="display: block;">
-    <label for="sourceSelect">Change video source:</label>
-    <select id="sourceSelect" style="max-width:400px">
-    </select>
-  </div>
-  <button id="startButton">시작</button>
-  <button id="resetButton">중지</button>
+	<div id="sourceSelectPanel" style="display: block;">
+		<label for="sourceSelect">Change video source:</label>
+		<select id="sourceSelect" style="max-width:400px">
+		</select>
+	</div>
+	<button id="startButton">시작</button>
+	<button id="resetButton">중지</button>
 </div>
 
 <!-- 하단 푸터 네비게이터 -->
 <!-- 1.비디오보기, 2.pdf파일 열기 3.정품인증 4.공구계산기 -->
 <div id="bottomNav">
-  <button class="bottomNavButton" onclick="location.href='https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164'">
-    <img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
-    <h4 class="bottomNavButtonText">Video<br/>Manual</h4>
-  </button>
-  <button class="bottomNavButton" onclick="location.href='https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing'">
-    <img class="bottomNavButtonImage" src="assets/ico-pdf@3x.png"/>
-    <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
-  </button>
-  <button class="bottomNavButton">
-    <img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
-    <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
-  </button>
-  <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
-    <img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
-    <h4 class="bottomNavButtonText">KTS<br/>
-      <h4 style="visibility: hidden">dummy</h4>
-    </h4>
-  </button>
+	<button class="bottomNavButton" onclick="location.href='https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164'">
+		<img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
+		<h4 class="bottomNavButtonText">Video<br/>Manual</h4>
+	</button>
+	<button class="bottomNavButton" onclick="location.href='https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing'">
+		<img class="bottomNavButtonImage" src="assets/ico-pdf@3x.png"/>
+		<h4 class="bottomNavButtonText">Product<br/>Guide</h4>
+	</button>
+	<button class="bottomNavButton">
+		<img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
+		<h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
+	</button>
+	<button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
+		<img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
+		<h4 class="bottomNavButtonText">KTS<br/>
+			<h4 style="visibility: hidden">dummy</h4>
+		</h4>
+	</button>
 </div>
 
 <!-- 정품인증 Barcode 가이드 화면 -->
 <div id="barcodeGuide" style="display: none">
-  <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
-  <div id="barcodeGuideInnerBox"></div>
-  <button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-1)">Cancel</button>
+	<img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
+	<div id="barcodeGuideInnerBox"></div>
+	<button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-1)">Cancel</button>
 </div>
 
 <!-- 정품인증 모달 화면 -->
 <div id="modal" style="display: none">
-  <div id="modalHeader" onclick="modalScreenChange(-1)">
-    <h1>Genuine Product<br/>Certification</h1>
-    <img src="assets/close-btn@3x.png"/>
-  </div>
-  <div id="modalBody">
-    <div id="modalGenuineInput">
-      <div class="modalGenuineInputItem">
-        <div class="modalGenuineInputItemText"><h1>KP-CODE</h1></div>
-        <input id="modalGenuineInputKpCode" type="text" value="bbb" disabled/>
-      </div>
-      <div class="modalGenuineInputItem">
-        <div class="modalGenuineInputItemText"><h1>LOT No.</h1></div>
-        <input id="modalGenuineInputLotNumber" type="text" disabled/>
-      </div>
-      <div class="modalGenuineInputItem">
-        <div class="modalGenuineInputItemText"><h1>SERIAL No.</h1></div>
-        <input id="modalGenuineInputSerialNumber" type="text" disabled/>
-      </div>
-      <div class="modalGenuineInputItem">
-        <div class="modalGenuineInputItemText"><h1>GPN</h1></div>
-        <input id="modalGenuineInputGpn" type="text"/>
-      </div>
-    </div>
-    <div id="modalGenuineConfirm" style="display: none">
-      <div id="modalGenuineConfirmInfo">
-        <h1>KP-CODE : <font id="modalGenuineConfirmKpCode">000000000WWW</font></h1>
-        <h1>LOT No. : <font id="modalGenuineConfirmLotNumber">DKDKDK</font></h1>
-        <h1>SERIAL NO. : <font id="modalGenuineConfirmSerialNumber">KDKDKD</font></h1>
-        <h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
-      </div>
-      <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
-    </div>
-  </div>
-  <div id="modalFooter">
-    <button id="modalFooterCancelButton">Cancel</button>
-    <button id="modalFooterOkButton">OK</button>
-  </div>
+	<div id="modalHeader" onclick="modalScreenChange(-1)">
+		<h1>Genuine Product<br/>Certification</h1>
+		<img src="assets/close-btn@3x.png"/>
+	</div>
+	<div id="modalBody">
+		<div id="modalGenuineInput">
+			<div class="modalGenuineInputItem">
+				<div class="modalGenuineInputItemText"><h1>KP-CODE</h1></div>
+				<input id="modalGenuineInputKpCode" type="text" value="bbb" disabled/>
+			</div>
+			<div class="modalGenuineInputItem">
+				<div class="modalGenuineInputItemText"><h1>LOT No.</h1></div>
+				<input id="modalGenuineInputLotNumber" type="text" disabled/>
+			</div>
+			<div class="modalGenuineInputItem">
+				<div class="modalGenuineInputItemText"><h1>SERIAL No.</h1></div>
+				<input id="modalGenuineInputSerialNumber" type="text" disabled/>
+			</div>
+			<div class="modalGenuineInputItem">
+				<div class="modalGenuineInputItemText"><h1>GPN</h1></div>
+				<input id="modalGenuineInputGpn" type="text"/>
+			</div>
+		</div>
+		<div id="modalGenuineConfirm" style="display: none">
+			<div id="modalGenuineConfirmInfo">
+				<h1>KP-CODE : <font id="modalGenuineConfirmKpCode">000000000WWW</font></h1>
+				<h1>LOT No. : <font id="modalGenuineConfirmLotNumber">DKDKDK</font></h1>
+				<h1>SERIAL NO. : <font id="modalGenuineConfirmSerialNumber">KDKDKD</font></h1>
+				<h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
+			</div>
+			<div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
+		</div>
+	</div>
+	<div id="modalFooter">
+		<button id="modalFooterCancelButton">Cancel</button>
+		<button id="modalFooterOkButton">OK</button>
+	</div>
 </div>
 
 
@@ -140,12 +140,12 @@
       document.getElementsByTagName('video')[0].setAttribute('id','video');
       // let environmentDeviceId = letsee.getSourceDeviceList()
       //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
-
+      
       initialBarcodeReader();
       initial3DModel();
     });
   }
-
+  
   // 초기 바코드 Reader init
   let currentDeviceId;
   let codeReader;
@@ -154,53 +154,53 @@
     codeReader = new ZXing.BrowserMultiFormatReader();
     console.log('ZXing code reader 초기화 성공~');
     codeReader.getVideoInputDevices()
-            .then((videoInputDevices) => {
-              console.log(selectedDeviceId);
-              const sourceSelect = document.getElementById('sourceSelect');
-              if (videoInputDevices.length >= 1) {
-                videoInputDevices.forEach((element) => {
-                  const sourceOption = document.createElement('option');
-                  sourceOption.text = element.label;
-                  sourceOption.value = element.deviceId;
-                  sourceSelect.appendChild(sourceOption)
-                });
-                sourceSelect.onchange = () => {
-                  selectedDeviceId = sourceSelect.value;
-                  currentDeviceId = selectedDeviceId;
-                };
-                const sourceSelectPanel = document.getElementById('sourceSelectPanel')
-                sourceSelectPanel.style.display = 'block'
-              }
-              document.getElementById('startButton').addEventListener('click', () => {
-                codeReader.reset();
-                setTimeout(() => {
-                  letsee.setVideoSource(selectedDeviceId);
-                }, 1000);
-
-                // // zxing Start
-                // setTimeout(() => {
-                //   codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
-                //     if (result) {
-                //       detected2DMatrixCallback(result);
-                //       console.log(result);
-                //     }
-                //     if (err && !(err instanceof ZXing.NotFoundException)) {
-                //       console.error(err);
-                //       // document.getElementById('result').textContent = err
-                //     }
-                //   });
-                // }, 3000);
-                console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
-              });
-
-              document.getElementById('resetButton').addEventListener('click', () => {
-                codeReader.reset();
-                letsee.setVideoSource(selectedDeviceId);
-              })
-            })
-            .catch((err) => {
-              console.error(err)
-            })
+    .then((videoInputDevices) => {
+      console.log(selectedDeviceId);
+      const sourceSelect = document.getElementById('sourceSelect');
+      if (videoInputDevices.length >= 1) {
+        videoInputDevices.forEach((element) => {
+          const sourceOption = document.createElement('option');
+          sourceOption.text = element.label;
+          sourceOption.value = element.deviceId;
+          sourceSelect.appendChild(sourceOption)
+        });
+        sourceSelect.onchange = () => {
+          selectedDeviceId = sourceSelect.value;
+          currentDeviceId = selectedDeviceId;
+        };
+        const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+        sourceSelectPanel.style.display = 'block'
+      }
+      document.getElementById('startButton').addEventListener('click', () => {
+        codeReader.reset();
+        setTimeout(() => {
+          letsee.setVideoSource(selectedDeviceId);
+        }, 1000);
+        
+        // // zxing Start
+        // setTimeout(() => {
+        //   codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+        //     if (result) {
+        //       detected2DMatrixCallback(result);
+        //       console.log(result);
+        //     }
+        //     if (err && !(err instanceof ZXing.NotFoundException)) {
+        //       console.error(err);
+        //       // document.getElementById('result').textContent = err
+        //     }
+        //   });
+        // }, 3000);
+        console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+      });
+      
+      document.getElementById('resetButton').addEventListener('click', () => {
+        codeReader.reset();
+        letsee.setVideoSource(selectedDeviceId);
+      })
+    })
+    .catch((err) => {
+      console.error(err)
+    })
   }
   function startBarcodeReader() {
     // zxing Start
@@ -215,12 +215,12 @@
       }
     });
   }
-
+  
   function stopBarCodeReader() {
     codeReader.reset();
     letsee.setVideoSource(currentDeviceId);
   }
-
+  
   // ----------- Dom, 화면 관련 메서드 ------------- //
   let barCodeGuideStack = 0;
   function barCodeGuideStackChange(screenStack) {
@@ -238,24 +238,24 @@
         break;
     }
   }
-
+  
   const MODAL = $("#modal");
   const MODAL_INPUT_SCREEN = $("#modalGenuineInput");
   const MODAL_INPUT_KP_CODE = $("#modalGenuineInputKpCode");
   const MODAL_INPUT_LOT_NUMBER = $("#modalGenuineInputLotNumber");
   const MODAL_INPUT_SERIAL_NUMBER = $("#modalGenuineInputSerialNumber");
   const MODAL_INPUT_GPN = $("#modalGenuineInputGpn");
-
+  
   const MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
   const MODAL_CONFIRM_KP_CODE = $("#modalGenuineConfirmKpCode");
   const MODAL_CONFIRM_LOT_NUMBER = $("#modalGenuineConfirmLotNumber");
   const MODAL_CONFIRM_SERIAL_NUMBER = $("#modalGenuineConfirmSerialNumber");
   const MODAL_CONFIRM_GPN = $("#modalGenuineConfirmGpn");
   const MODAL_CONFIRM_RESULT = $("#modalGenuineConfirmResult");
-
+  
   const MODAL_FOOTER_OK_BUTTON = $("#modalFooterOkButton");
   const MODAL_FOOTER_CANCEL_BUTTON = $("#modalFooterCancelButton");
-
+  
   let kpCode, lotNumber, serialNumber, gpn;
   let modalBodyState = 0;
   function modalScreenChange(state) {
@@ -269,7 +269,7 @@
         MODAL_CONFIRM_SCREEN.hide();
         modalBodyState = 0;
         break;
-
+      
       case 1:
         MODAL_INPUT_SCREEN.hide();
         MODAL_CONFIRM_KP_CODE.text(kpCode);
@@ -289,14 +289,14 @@
         }
         MODAL_CONFIRM_SCREEN.show();
         break;
-
+      
       case -1: // modal close
         MODAL_INPUT_GPN.val("");
         MODAL.hide();
         modalBodyState = -1;
         letsee.setVideoSource(currentDeviceId);
         break;
-
+      
       case 100: // modal open
         modalScreenChange(0);
         MODAL_FOOTER_OK_BUTTON.text('Ok');
@@ -304,7 +304,7 @@
         break;
     }
   }
-
+  
   // 100: 모달화면 열기 / -1: 모달화면 닫기 / 0: input화면 열기 / 1: confirm화면 (제품번호 일치) / 2: confirm화면 (제품번호 불일치)
   MODAL_FOOTER_OK_BUTTON.click( function() {
     if (modalBodyState === 0) {
@@ -328,7 +328,7 @@
     MODAL_CONFIRM_SERIAL_NUMBER.text('');
     modalScreenChange(-1);
   });
-
+  
   // zxing의 바코드 스캔 이후 동작하는 콜백함수
   // 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱한 뒤 제품인증 모달을 띄워준다.
   function detected2DMatrixCallback (result) {
@@ -349,19 +349,19 @@
       console.log(_kpCode, _lotNumber, _serialNumber);
       return {_kpCode, _lotNumber, _serialNumber};
     };
-
+    
     if (barCodeGuideStack === 100) {
       let {_kpCode, _lotNumber, _serialNumber} = parseProductNumberFromString(result.text);
       kpCode= _kpCode;
       lotNumber = _lotNumber;
       serialNumber = _serialNumber;
-
+      
       console.log(kpCode, lotNumber, serialNumber);
       barCodeGuideStackChange(-1);
       modalScreenChange(100);
     }
   }
-
+  
   let mesh;
   // 3D STL모델을 화면에 그려주고 z축 회전 애니메이션을 동작시켜주는 함수.
   function initial3DModel() {
@@ -372,10 +372,10 @@
     this.loader = new THREE.STLLoader();
     this.mesh = null;
     this.oldTime = null;
-
+    
     this.renderer.addObjectToEntity('korloy-product.json', this.world);
     this.scene.add( new THREE.HemisphereLight( 0x000000, 0xffffff ));
-
+    
     // 3D 모델을 Z축으로 회전시켜줌.
     // letsee의 engine프레임과 동시화시켜줌.
     const animate = (object) => (tick) => {
@@ -383,16 +383,23 @@
       // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
       if(this.oldTime) {
         const delta = tick- this.oldTime;
-        // let time = Date.now() * 0.0004;
+        // if (this.mesh !== null) {
+        //   this.mesh.rotation.x = delta * 0.7;
+        //   this.mesh.rotation.z = delta;
+        // }
+  
+        let time = Date.now() * 0.001;
         if (this.mesh !== null) {
-          this.mesh.rotation.x = delta * 0.7;
-          this.mesh.rotation.z = delta;
+          // this.mesh.rotation.x = time;
+          this.mesh.rotation.z = time;
+          // this.mesh.rotation.y = time;
         }
+        
         requestAnimationFrame(animate);
       }
       this.oldTime = tick;
     };
-
+    
     this.loader.load( './models/stl/korloy.stl', (geometry) => {
       const material = new THREE.MeshPhongMaterial({
         color: 0xc7c7c2,
@@ -401,14 +408,18 @@
         emissive: 0x0,
       });
       this.mesh = new THREE.Mesh( geometry, material );
-      this.mesh.position.set( -10, 0, 10 );
+      this.mesh.position.set(0, 0, 10 );
       this.mesh.scale.set( 0.5, 0.5, 0.5 );
-      this.mesh.rotation.x = -15;
-      this.mesh.rotation.y = -260;
-
+      // this.mesh.rotation.x = -15;
+      // this.mesh.rotation.y = -260;
+      // this.mesh.rotation.y = 10;
+      
       this.mesh.castShadow = true;
       this.mesh.receiveShadow = true;
       this.world.add(this.mesh);
+
+      this.world.rotation.set(-15, -260, 0);
+      
       mesh = this.mesh;
       letsee.addRenderModule({
         name: '3DObjectRotate',
