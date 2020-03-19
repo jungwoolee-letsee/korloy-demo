@@ -141,7 +141,7 @@
       // let environmentDeviceId = letsee.getSourceDeviceList()
       //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
 
-      chooseBarcodeReader();
+      initialBarcodeReader();
       initial3DModel();
     });
   }
@@ -149,7 +149,7 @@
   // 초기 바코드 Reader init
   let currentDeviceId;
   let codeReader;
-  function chooseBarcodeReader() {
+  function initialBarcodeReader() {
     let selectedDeviceId;
     codeReader = new ZXing.BrowserMultiFormatReader();
     console.log('ZXing code reader 초기화 성공~');
@@ -278,7 +278,7 @@
         MODAL_CONFIRM_GPN.text(MODAL_INPUT_GPN.val());
         const inputGpn = MODAL_CONFIRM_GPN.text();
         // dmmmy GPN과 일치여부 판단.
-        if (inputGpn === '8GLXC42') {
+        if (inputGpn === 'test') {
           MODAL_CONFIRM_RESULT.text('Thank you for using a genuine product.');
           MODAL_FOOTER_CANCEL_BUTTON.hide();
           modalBodyState = 1;
@@ -294,6 +294,7 @@
         MODAL_INPUT_GPN.val("");
         MODAL.hide();
         modalBodyState = -1;
+        letsee.setVideoSource(currentDeviceId);
         break;
 
       case 100: // modal open
@@ -361,6 +362,7 @@
     }
   }
 
+  let mesh;
   // 3D STL모델을 화면에 그려주고 z축 회전 애니메이션을 동작시켜주는 함수.
   function initial3DModel() {
     this.world = new THREE.Object3D();
@@ -376,14 +378,17 @@
 
     // 3D 모델을 Z축으로 회전시켜줌.
     // letsee의 engine프레임과 동시화시켜줌.
-    const rotateZaxis = (object) => (tick) => {
+    const animate = (object) => (tick) => {
       // tick : 한프레임당 계산이 끝난 시간에 따른 누계.
       // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
       if(this.oldTime) {
         const delta = tick- this.oldTime;
-        //console.log(delta);
-        object.rotation.z = object.rotation.z + 0.1;
-        requestAnimationFrame(rotateZaxis);
+        // let time = Date.now() * 0.0004;
+        if (this.mesh !== null) {
+          this.mesh.rotation.x = delta * 0.7;
+          this.mesh.rotation.z = delta;
+        }
+        requestAnimationFrame(animate);
       }
       this.oldTime = tick;
     };
@@ -396,14 +401,18 @@
         emissive: 0x0,
       });
       this.mesh = new THREE.Mesh( geometry, material );
-      this.mesh.position.set( 0, 0, 30 );
+      this.mesh.position.set( -10, 0, 10 );
       this.mesh.scale.set( 0.5, 0.5, 0.5 );
+      this.mesh.rotation.x = -15;
+      this.mesh.rotation.y = -260;
+
       this.mesh.castShadow = true;
       this.mesh.receiveShadow = true;
       this.world.add(this.mesh);
+      mesh = this.mesh;
       letsee.addRenderModule({
         name: '3DObjectRotate',
-        onRender: rotateZaxis(this.mesh)
+        onRender: animate(this.mesh)
       });
     }, (progress) => {
       //console.log(progress);
