@@ -263,3 +263,9 @@ input {
 #buttonContainer {
 
 }
+
+#sourceButtonItems {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+}
