@@ -24,11 +24,11 @@
 
 <div id="container">
 </div>
+<h1 id="3dPercents">하이</h1>
 <div id="buttonContainer">
-  <div id="sourceSelectPanel" style="display: block;">
-    <label for="sourceSelect"></label>
-    <select id="sourceSelect">
-    </select>
+  <div id="sourceSelectPanel">
+<!--    <label for="sourceSelect"></label>-->
+    <select id="sourceSelect"></select>
   </div>
   <div id="sourceButtonItems">
     <button id="startButton">시작!</button>
@@ -39,11 +39,11 @@
 <!-- 하단 푸터 네비게이터 -->
 <!-- 1.비디오보기, 2.pdf파일 열기 3.정품인증 4.공구계산기 -->
 <div id="bottomNav">
-  <button class="bottomNavButton" onclick="location.href='https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164'">
+  <button class="bottomNavButton" onclick="	window.open('https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164', '_blank');">
     <img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
     <h4 class="bottomNavButtonText">Video<br/>Manual</h4>
   </button>
-  <button class="bottomNavButton" onclick="location.href='https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing'">
+  <button class="bottomNavButton" onclick="	window.open('https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing', '_blank');">
     <img class="bottomNavButtonImage" src="assets/ico-pdf@3x.png"/>
     <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
   </button>
@@ -51,7 +51,8 @@
     <img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
     <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
   </button>
-  <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
+
+  <button class="bottomNavButton" onclick="window.open('http://kts.korloy.com/app/kts/index.html#/kts/calc', '_blank');">
     <img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
     <h4 class="bottomNavButtonText">KTS<br/>
       <h4 style="visibility: hidden">dummy</h4>
@@ -414,7 +415,7 @@
         //   this.mesh.rotation.z = delta;
         // }
 
-        let time = Date.now() * 0.003;
+        let time = Date.now() * 0.0015;
         if (this.mesh !== null) {
           this.mesh.rotation.z = time;
         }
@@ -446,11 +447,17 @@
         name: '3DObjectRotate',
         onRender: animate(this.mesh)
       });
-    }, (progress) => {
-      // console.log(progress);
-    }, (error) => {
+    }, onProgress, (error) => {
       console.log(error);
     });
+  }
+  // Show the progress of loading model
+  function onProgress( xhr ) {
+    if ( xhr.lengthComputable ) {
+      const percentComplete = xhr.loaded / xhr.total * 100;
+      console.log(Math.round( percentComplete, 2 ) + '%')
+    }
+
   }
 </script>
 </body>

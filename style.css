@@ -286,3 +286,16 @@ input {
     object-fit: contain;
     margin-bottom: 10vh;
 }
+
+#sourceSelectPanel {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#3dPercents {
+    position: absolute;
+    right: 0;
+    color: white;
+    z-index: 260;
+}
