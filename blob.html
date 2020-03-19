@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="minimum-scale=1.0, width=device-width, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+          name="viewport"/>
+    <script src='https://code.jquery.com/jquery-2.2.4.min.js'></script>
+    <link href="https://fonts.googleapis.com/css?family=Nanum+Gothic:400,700,800|Noto+Sans+KR:400,500,700|Roboto:400,500,700&display=swap&subset=korean" rel="stylesheet">
+    <title>Title</title>
+    <link rel="stylesheet" href="style.css"/>
+    <script src="../lib/letsee-0.9.20.js"></script>
+
+    <style type="text/css" media="place">
+        #container {
+            -letsee-target: uri('korloy-product.json');
+            -letsee-transform: translate(0, 0, 0);
+            width: 100px;
+            height: 300px;
+        }
+    </style>
+</head>
+<body>
+
+<div id="container"></div>
+
+<div id="buttonContainer">
+    <div id="sourceSelectPanel" style="display: block;">
+        <label for="sourceSelect">Change video source:</label>
+        <select id="sourceSelect" style="max-width:400px">
+        </select>
+    </div>
+    <button id="startButton">시작</button>
+    <button id="resetButton">중지</button>
+</div>
+
+<!-- 하단 푸터 네비게이터 -->
+<!-- 1.비디오보기, 2.pdf파일 열기 3.정품인증 4.공구계산기 -->
+<div id="bottomNav">
+    <button class="bottomNavButton" onclick="location.href='https://player.vimeo.com/external/398187333.sd.mp4?s=167e864af8cfc3a8ba64ac682bef66353314e751&profile_id=164'">
+        <img class="bottomNavButtonImage" src="assets/ico-video@3x.png"/>
+        <h4 class="bottomNavButtonText">Video<br/>Manual</h4>
+    </button>
+    <button class="bottomNavButton" onclick="location.href='https://drive.google.com/file/d/1YeiJOokclN0WyuRB8xkRk_kTFjRj1uBA/view?usp=sharing'">
+        <img class="bottomNavButtonImage" src="assets/ico-pdf@3x.png"/>
+        <h4 class="bottomNavButtonText">Product<br/>Guide</h4>
+    </button>
+    <button class="bottomNavButton">
+        <img class="bottomNavButtonImage" onclick="barCodeGuideStackChange(100)" src="assets/ico-certi@3x.png"/>
+        <h4 class="bottomNavButtonText">Genuine<br/>Check</h4>
+    </button>
+    <button class="bottomNavButton" onclick="location.href='http://kts.korloy.com/app/kts/index.html#/kts/calc'" >
+        <img class="bottomNavButtonImage" src="assets/ico-calculator@3x.png"/>
+        <h4 class="bottomNavButtonText">KTS<br/>
+            <h4 style="visibility: hidden">dummy</h4>
+        </h4>
+    </button>
+</div>
+
+<!-- 정품인증 Barcode 가이드 화면 -->
+<div id="barcodeGuide" style="display: none">
+    <img id="barcodeGuideImage" src="assets/text-guide@3x.png"/>
+    <div id="barcodeGuideInnerBox"></div>
+    <button id="barcodeGuideCancelButton" onclick="barCodeGuideStackChange(-1)">Cancel</button>
+</div>
+
+<!-- 정품인증 모달 화면 -->
+<div id="modal" style="display: none">
+    <div id="modalHeader" onclick="modalScreenChange(-1)">
+        <h1>Genuine Product<br/>Certification</h1>
+        <img src="assets/close-btn@3x.png"/>
+    </div>
+    <div id="modalBody">
+        <div id="modalGenuineInput">
+            <div class="modalGenuineInputItem">
+                <div class="modalGenuineInputItemText"><h1>KP-CODE</h1></div>
+                <input id="modalGenuineInputKpCode" type="text" value="bbb" disabled/>
+            </div>
+            <div class="modalGenuineInputItem">
+                <div class="modalGenuineInputItemText"><h1>LOT No.</h1></div>
+                <input id="modalGenuineInputLotNumber" type="text" disabled/>
+            </div>
+            <div class="modalGenuineInputItem">
+                <div class="modalGenuineInputItemText"><h1>SERIAL No.</h1></div>
+                <input id="modalGenuineInputSerialNumber" type="text" disabled/>
+            </div>
+            <div class="modalGenuineInputItem">
+                <div class="modalGenuineInputItemText"><h1>GPN</h1></div>
+                <input id="modalGenuineInputGpn" type="text"/>
+            </div>
+        </div>
+        <div id="modalGenuineConfirm" style="display: none">
+            <div id="modalGenuineConfirmInfo">
+                <h1>KP-CODE : <font id="modalGenuineConfirmKpCode">000000000WWW</font></h1>
+                <h1>LOT No. : <font id="modalGenuineConfirmLotNumber">DKDKDK</font></h1>
+                <h1>SERIAL NO. : <font id="modalGenuineConfirmSerialNumber">KDKDKD</font></h1>
+                <h1>GPN : <font id="modalGenuineConfirmGpn">AJAJAJ</font></h1>
+            </div>
+            <div id="modalGenuineConfirmResult"><h1>This Product is not genuine.</h1></div>
+        </div>
+    </div>
+    <div id="modalFooter">
+        <button id="modalFooterCancelButton">Cancel</button>
+        <button id="modalFooterOkButton">OK</button>
+    </div>
+</div>
+
+<img style="display: block; width: 100px; height: 100px;"id="barCodeBinaryImage" />
+
+
+<script>
+    const config = {
+        // appKey: '417e8094b7ba9bf9632d8cc5aa94b57fd65582d2d3d2112233e0a727d0d59d05',
+        trackerType: 'IMAGE',
+        bodyId: 'fallback-test',
+        external: "THREE",
+    };
+    window.addEventListener('load', function () {
+        startLetsee();
+    });
+</script>
+
+<!-- 서드파티 라이브러리 -->
+<script type="text/javascript" src="https://unpkg.com/@zxing/library@latest"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/105/three.min.js"></script>
+<script src="vendor/inflate.min.js"></script>
+<script src="vendor/loaders/STLLoader.js"></script>
+
+<script>
+    /**
+     * 렛시 start 프로세스
+     * 1. 렛시를 초기화함.
+     * 2. 현재 video태그에 id가 없기 때문에 barcodeReader에서 인식할 수 있도록 id태그를 입력하여줌.
+     * 3. 후면카메라의 deviceId를 barcodeReader로 넘겨준다.
+     * 4. 후면카메라가 없을경우 예외처리. (테스트용도)
+     */
+    function startLetsee() {
+        letsee.init(config, () => {
+            console.log('Loaded 됨!');
+            // letsee.setVideoSource('b805681e340a7dcbb9688c5b81e960cca210ed3fbfebe7212971f1ad491183ca');
+            // 로지텍 디바이스
+            letsee.setVideoSource('environment');
+            document.getElementsByTagName('video')[0].setAttribute('id','video');
+            // let environmentDeviceId = letsee.getSourceDeviceList()
+            //         .find((result) => result.deviceId = "2e6ca0c75165e874e07379aa0135986cd6eed12e1341942cadd6b8f76aa034eb")
+
+            initialBarcodeReader();
+            initial3DModel();
+        });
+    }
+
+    let codeReader;
+    function initialBarcodeReader() {
+        codeReader = new ZXing.BrowserBarcodeReader();
+        console.log('ZXing code reader initialized')
+    }
+
+    // // 초기 바코드 Reader init
+    // function initialBarcodeReader(deviceId) {
+    //   let selectedDeviceId;
+    //   const codeReader = new ZXing.BrowserMultiFormatReader();
+    //   console.log('ZXing code reader 초기화 성공~');
+    //   codeReader.getVideoInputDevices()
+    //           .then((videoInputDevices) => {
+    //             /**
+    //              * 해당 부분에서 비디오 input 디바이스 목록을 얻어옴.
+    //              */
+    //             // selectedDeviceId = videoInputDevices[1].deviceId;
+    //
+    //             console.log(selectedDeviceId);
+    //             const sourceSelect = document.getElementById('sourceSelect');
+    //             if (videoInputDevices.length >= 1) {
+    //               videoInputDevices.forEach((element) => {
+    //                 const sourceOption = document.createElement('option');
+    //                 sourceOption.text = element.label;
+    //                 sourceOption.value = element.deviceId;
+    //                 sourceSelect.appendChild(sourceOption)
+    //               });
+    //
+    //               sourceSelect.onchange = () => {
+    //                 selectedDeviceId = sourceSelect.value;
+    //               };
+    //
+    //               const sourceSelectPanel = document.getElementById('sourceSelectPanel')
+    //               sourceSelectPanel.style.display = 'block'
+    //             }
+    //             document.getElementById('startButton').addEventListener('click', () => {
+    //               codeReader.reset();
+    //
+    //               setTimeout(() => {
+    //                 letsee.setVideoSource(selectedDeviceId);
+    //               }, 1000);
+    //
+    //               setTimeout(() => {
+    //                 codeReader.decodeFromVideoDevice(selectedDeviceId, 'video', (result, err) => {
+    //                   if (result) {
+    //                     detected2DMatrixCallback(result);
+    //                     console.log(result);
+    //                   }
+    //                   if (err && !(err instanceof ZXing.NotFoundException)) {
+    //                     console.error(err);
+    //                     // document.getElementById('result').textContent = err
+    //                   }
+    //                 });
+    //               }, 3000);
+    //               console.log(`Started continous decode from camera with id ${selectedDeviceId}`)
+    //             });
+    //
+    //             document.getElementById('resetButton').addEventListener('click', () => {
+    //               codeReader.reset();
+    //               letsee.setVideoSource(selectedDeviceId);
+    //             })
+    //
+    //           })
+    //           .catch((err) => {
+    //             console.error(err)
+    //           })
+    // }
+
+    let _interval = null;
+    // ----------- Dom, 화면 관련 메서드 ------------- //
+    let barCodeGuideStack = 0;
+    function barCodeGuideStackChange(screenStack) {
+        const BARCODE_GUIDE = $("#barcodeGuide");
+        switch (screenStack) {
+            case -1:
+                barCodeGuideStack = -1;
+                BARCODE_GUIDE.hide();
+                _interval = null;
+                break;
+            case 100:
+                barCodeGuideStack = 100;
+                BARCODE_GUIDE.show();
+                _interval = setInterval(function(){
+                    let _img = document.getElementById('barCodeBinaryImage');
+                    const _targets = document.getElementsByTagName('video')[0].parentElement.childNodes;
+                    const _canvas = _targets.item(1);
+                    let _ctx = _canvas.getContext('2d', {alpha: false});
+                    let _data = _ctx.getImageData(0, 0, window.innerWidth, window.innerHeight);
+
+
+                    let _dataURL = _canvas.toDataURL("image/png", 0.5);
+                    // _dataURL= _dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+
+                    _img.src =_dataURL;
+
+                    codeReader.decodeFromImageElement(_dataURL,"barCodeBinaryImage").then((result) => {
+                        console.log(result)
+                    }).catch((err) => {
+                        console.error(err)
+                    });
+
+                }, 2000);
+                break;
+        }
+    }
+
+    const MODAL = $("#modal");
+    const MODAL_INPUT_SCREEN = $("#modalGenuineInput");
+    const MODAL_INPUT_KP_CODE = $("#modalGenuineInputKpCode");
+    const MODAL_INPUT_LOT_NUMBER = $("#modalGenuineInputLotNumber");
+    const MODAL_INPUT_SERIAL_NUMBER = $("#modalGenuineInputSerialNumber");
+    const MODAL_INPUT_GPN = $("#modalGenuineInputGpn");
+
+    const MODAL_CONFIRM_SCREEN = $("#modalGenuineConfirm");
+    const MODAL_CONFIRM_KP_CODE = $("#modalGenuineConfirmKpCode");
+    const MODAL_CONFIRM_LOT_NUMBER = $("#modalGenuineConfirmLotNumber");
+    const MODAL_CONFIRM_SERIAL_NUMBER = $("#modalGenuineConfirmSerialNumber");
+    const MODAL_CONFIRM_GPN = $("#modalGenuineConfirmGpn");
+    const MODAL_CONFIRM_RESULT = $("#modalGenuineConfirmResult");
+
+    const MODAL_FOOTER_OK_BUTTON = $("#modalFooterOkButton");
+    const MODAL_FOOTER_CANCEL_BUTTON = $("#modalFooterCancelButton");
+
+    let kpCode, lotNumber, serialNumber, gpn;
+    let modalBodyState = 0;
+    function modalScreenChange(state) {
+        // 100: 모달화면 열기 / -1: 모달화면 닫기 / 0: input화면 열기 / 1: confirm화면 (제품번호 일치) / 2: confirm화면 (제품번호 불일치)
+        switch (state) {
+            case 0:
+                MODAL_INPUT_KP_CODE.val(kpCode);
+                MODAL_INPUT_LOT_NUMBER.val(lotNumber);
+                MODAL_INPUT_SERIAL_NUMBER.val(serialNumber);
+                MODAL_INPUT_SCREEN.show();
+                MODAL_CONFIRM_SCREEN.hide();
+                modalBodyState = 0;
+                break;
+
+            case 1:
+                MODAL_INPUT_SCREEN.hide();
+                MODAL_CONFIRM_KP_CODE.text(kpCode);
+                MODAL_CONFIRM_LOT_NUMBER.text(lotNumber);
+                MODAL_CONFIRM_SERIAL_NUMBER.text(serialNumber);
+                MODAL_CONFIRM_GPN.text(MODAL_INPUT_GPN.val());
+                const inputGpn = MODAL_CONFIRM_GPN.text();
+                // dmmmy GPN과 일치여부 판단.
+                if (inputGpn === '8GLXC42') {
+                    MODAL_CONFIRM_RESULT.text('Thank you for using a genuine product.');
+                    MODAL_FOOTER_CANCEL_BUTTON.hide();
+                    modalBodyState = 1;
+                } else {
+                    MODAL_CONFIRM_RESULT.text('This product is not Genuine.');
+                    MODAL_FOOTER_OK_BUTTON.text('Try Again');
+                    modalBodyState = 2;
+                }
+                MODAL_CONFIRM_SCREEN.show();
+                break;
+
+            case -1: // modal close
+                MODAL_INPUT_GPN.val("");
+                MODAL.hide();
+                modalBodyState = -1;
+                break;
+
+            case 100: // modal open
+                modalScreenChange(0);
+                MODAL_FOOTER_OK_BUTTON.text('Ok');
+                MODAL.show();
+                break;
+        }
+    }
+
+    // 100: 모달화면 열기 / -1: 모달화면 닫기 / 0: input화면 열기 / 1: confirm화면 (제품번호 일치) / 2: confirm화면 (제품번호 불일치)
+    MODAL_FOOTER_OK_BUTTON.click( function() {
+        if (modalBodyState === 0) {
+            modalScreenChange(1);
+        } else if (modalBodyState === 1) {
+            // 제품번호 일치시 OK버튼 클릭
+            MODAL_CONFIRM_KP_CODE.text('');
+            MODAL_CONFIRM_LOT_NUMBER.text('');
+            MODAL_CONFIRM_SERIAL_NUMBER.text('');
+            MODAL_FOOTER_CANCEL_BUTTON.show();
+            modalScreenChange(-1);
+        } else if (modalBodyState === 2) {
+            // 제품번호 불일치시 OK버튼 클릭
+            MODAL_FOOTER_OK_BUTTON.text('Ok');
+            modalScreenChange(0);
+        }
+    });
+    MODAL_FOOTER_CANCEL_BUTTON.click(function() {
+        MODAL_CONFIRM_KP_CODE.text('');
+        MODAL_CONFIRM_LOT_NUMBER.text('');
+        MODAL_CONFIRM_SERIAL_NUMBER.text('');
+        modalScreenChange(-1);
+    });
+
+    // zxing의 바코드 스캔 이후 동작하는 콜백함수
+    // 2d 매트릭스 결과를 kpCode, lotNumber, serialNumber로 파싱한 뒤 제품인증 모달을 띄워준다.
+    function detected2DMatrixCallback (result) {
+        /**
+         * 데이터 Matrix로부터 넘어온 String을 파싱함.
+         * 데이터 형식 : "1-02-037151000143326900550010A000118H31"
+         * 품번(KP-CODE) => 처음 11개 : 1번째부터 11번째 숫자.
+         * Lot번호 => 이후 10개 => 12번째부터 21번째 숫자.
+         * Serial번호 => 이후 4개 => 22번째부터 25번째 숫자.
+         */
+        const parseProductNumberFromString = (str) => {
+            let _kpCode = str.substr(0, 11);
+            str = str.substr(11);
+            let _lotNumber = str.substr(0, 10);
+            str = str.substr(10);
+            let _serialNumber = str.substr(0, 4);
+            str = str.substr(4);
+            console.log(_kpCode, _lotNumber, _serialNumber);
+            return {_kpCode, _lotNumber, _serialNumber};
+        };
+
+        if (barCodeGuideStack === 100) {
+            let {_kpCode, _lotNumber, _serialNumber} = parseProductNumberFromString(result.text);
+            kpCode= _kpCode;
+            lotNumber = _lotNumber;
+            serialNumber = _serialNumber;
+
+            console.log(kpCode, lotNumber, serialNumber);
+            barCodeGuideStackChange(-1);
+            modalScreenChange(100);
+        }
+    }
+
+    // 3D STL모델을 화면에 그려주고 z축 회전 애니메이션을 동작시켜주는 함수.
+    function initial3DModel() {
+        this.world = new THREE.Object3D();
+        this.renderer = letsee.threeRenderer;
+        this.camera = renderer.camera;
+        this.scene = renderer.scene;
+        this.loader = new THREE.STLLoader();
+        this.mesh = null;
+        this.oldTime = null;
+
+        this.renderer.addObjectToEntity('korloy-product.json', this.world);
+        this.scene.add( new THREE.HemisphereLight( 0x000000, 0xffffff ));
+
+        // 3D 모델을 Z축으로 회전시켜줌.
+        // letsee의 engine프레임과 동시화시켜줌.
+        const rotateZaxis = (object) => (tick) => {
+            // tick : 한프레임당 계산이 끝난 시간에 따른 누계.
+            // oldTime : tick의 차이(현제 누계 - 이전누계)를 이용하여 현재 fps값을 추출할 수 있음.
+            if(this.oldTime) {
+                const delta = tick- this.oldTime;
+                //console.log(delta);
+                object.rotation.z = object.rotation.z + 0.1;
+                requestAnimationFrame(rotateZaxis);
+            }
+            this.oldTime = tick;
+        };
+
+        this.loader.load( './models/stl/korloy.stl', (geometry) => {
+            const material = new THREE.MeshPhongMaterial({
+                color: 0xc7c7c2,
+                specular: 0x000000,
+                shininess: 100,
+                emissive: 0x0,
+            });
+            this.mesh = new THREE.Mesh( geometry, material );
+            this.mesh.position.set( 0, 0, 30 );
+            this.mesh.scale.set( 0.5, 0.5, 0.5 );
+            this.mesh.castShadow = true;
+            this.mesh.receiveShadow = true;
+            this.world.add(this.mesh);
+            letsee.addRenderModule({
+                name: '3DObjectRotate',
+                onRender: rotateZaxis(this.mesh)
+            });
+        }, (progress) => {
+            // console.log(progress);
+        }, (error) => {
+            console.log(error);
+        });
+    }
+</script>
+</body>
+</html>
